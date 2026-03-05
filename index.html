@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusX Intelligence | Account Verification</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --gold-hover: #F3E5AB;
+            --dark-bg: #050A15;
+            --panel-bg: rgba(15, 23, 42, 0.65);
+            --border-glow: rgba(212, 175, 55, 0.3);
+            --text-main: #E2E8F0;
+            --text-muted: #94A3B8;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #000000 100%);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-attachment: fixed;
+        }
+
+        .container {
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 40px;
+            border-radius: 16px;
+            border: 1px solid var(--border-glow);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+            width: 420px;
+        }
+
+        h2 {
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            color: var(--gold);
+            font-size: 28px;
+            letter-spacing: 1.5px;
+            margin-top: 0;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 13px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .tab:hover {
+            color: var(--gold-hover);
+        }
+
+        .tab.active {
+            border-bottom: 2px solid var(--gold);
+            color: var(--gold);
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            box-sizing: border-box;
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+        }
+
+        input[type="file"] {
+            padding: 9px;
+            color: var(--text-muted);
+        }
+
+        input[type="file"]::file-selector-button {
+            background: var(--gold);
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 15px;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #BF953F, #FCF6BA, #B38728, #FBF5B7);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+        }
+
+        #result-box {
+            margin-top: 25px;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            font-weight: 500;
+            display: none;
+            border: 1px solid transparent;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Loading Spinner Animation */
+        .spinner-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 0;
+        }
+
+        .spinner {
+            width: 45px;
+            height: 45px;
+            border: 3px solid rgba(212, 175, 55, 0.1);
+            border-top: 3px solid var(--gold);
+            border-radius: 50%;
+            animation: spin 1s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite;
+            margin-bottom: 15px;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+        }
+
+        .loading-text {
+            color: var(--gold);
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; text-shadow: none; }
+            50% { opacity: 1; text-shadow: 0 0 10px rgba(212, 175, 55, 0.6); }
+            100% { opacity: 0.6; text-shadow: none; }
+        }
+
+        /* High-end styling for the results */
+        .fake { 
+            background: rgba(220, 38, 38, 0.1); 
+            border-color: rgba(220, 38, 38, 0.4) !important;
+            color: #FCA5A5; 
+            box-shadow: 0 0 20px rgba(220, 38, 38, 0.1);
+        }
+        
+        .real { 
+            background: rgba(212, 175, 55, 0.05); 
+            border-color: var(--gold) !important;
+            color: var(--gold); 
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
+        }
+
+        .stats-preview {
+            font-size: 12px;
+            margin-top: 15px;
+            color: var(--text-muted);
+            text-align: left;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.05);
+            line-height: 1.6;
+        }
+
+        .verified-badge {
+            color: #000;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 12px;
+            display: inline-block;
+            background: linear-gradient(135deg, #BF953F, #FCF6BA);
+            padding: 6px 14px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Account Scan</h2>
+    
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('search')">Search</div>
+        <div class="tab" onclick="switchTab('upload')">Upload</div>
+        <div class="tab" onclick="switchTab('manual')">Manual</div>
+    </div>
+
+    <div id="search-tab" class="tab-content active">
+        <form id="searchForm">
+            <div class="form-group">
+                <label>Target Username</label>
+                <input type="text" id="search_username" placeholder="e.g., @investor_john" required>
+            </div>
+            <button type="submit">Initiate Scan</button>
+        </form>
+    </div>
+
+    <div id="upload-tab" class="tab-content">
+        <form id="uploadForm">
+            <div class="form-group">
+                <label>Profile Evidence (Screenshot)</label>
+                <input type="file" id="profile_image" accept="image/*" required>
+            </div>
+            <button type="submit">Analyze Imagery</button>
+        </form>
+    </div>
+
+    <div id="manual-tab" class="tab-content">
+        <form id="manualForm">
+            <div class="form-group"><label>Follower Count</label><input type="number" id="follower_count" value="10" required></div>
+            <div class="form-group"><label>Following Count</label><input type="number" id="following_count" value="4000" required></div>
+            <div class="form-group"><label>Profile Image Present?</label><select id="has_profile_pic"><option value="1">Yes</option><option value="0" selected>No</option></select></div>
+            <div class="form-group"><label>Numeric Characters in Name</label><input type="number" id="username_digits" value="6" required></div>
+            <div class="form-group"><label>Account Age (Days)</label><input type="number" id="account_age_days" value="5" required></div>
+            <button type="submit">Process Manual Data</button>
+        </form>
+    </div>
+
+    <div id="result-box"></div>
+</div>
+
+<script>
+    function switchTab(tabName) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById(tabName + '-tab').classList.add('active');
+        document.getElementById('result-box').style.display = 'none';
+    }
+
+    function displayResult(result) {
+        const resultBox = document.getElementById('result-box');
+        
+        let profileHtml = '';
+        let badgeHtml = '';
+        
+        if (result.badge_detected && result.badge_detected.includes("Yes")) {
+            badgeHtml = `<div class="verified-badge">✔️ Cryptographically Verified</div>`;
+        }
+
+        if (result.profile_details) {
+            profileHtml = `
+                <div style="display: flex; align-items: center; background: rgba(0,0,0,0.4); border: 1px solid rgba(212, 175, 55, 0.2); padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: left;">
+                    <img src="${result.profile_details.pic_url}" style="width: 50px; height: 50px; border-radius: 50%; margin-right: 15px; border: 2px solid #D4AF37; object-fit: cover; box-shadow: 0 0 10px rgba(212,175,55,0.2);">
+                    <div>
+                        <h4 style="margin: 0; font-size: 15px; color: #fff; font-family: 'Playfair Display', serif; letter-spacing: 0.5px;">${result.profile_details.name}</h4>
+                        <p style="margin: 2px 0 0 0; font-size: 12px; color: #D4AF37; font-weight: 500;">@${result.searched_username}</p>
+                        <p style="margin: 5px 0 0 0; font-size: 11px; color: #94A3B8; font-style: italic;">${result.profile_details.bio}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        let statsHtml = `
+            <div class="stats-preview">
+                <b style="color: #D4AF37;">Extracted Telemetry:</b><br><br>
+                Followers: ${result.scanned_stats.follower_count.toLocaleString()} | Following: ${result.scanned_stats.following_count.toLocaleString()}<br>
+                Age (days): ${result.scanned_stats.account_age_days} | Digits in Name: ${result.scanned_stats.username_digits}
+            </div>
+        `;
+
+        resultBox.innerHTML = `
+            ${profileHtml}
+            <div style="font-size: 24px; font-family: 'Playfair Display', serif; letter-spacing: 1px; text-transform: uppercase;">${result.prediction}</div>
+            <div style="font-size:12px; font-weight:300; margin-top: 8px; letter-spacing: 1px; color: #94A3B8;">AI CONFIDENCE: ${(100 - result.fake_probability).toFixed(2)}%</div>
+            ${badgeHtml}
+            ${statsHtml}
+        `;
+        
+        resultBox.className = result.prediction === "Fake Account" ? 'fake' : 'real';
+    }
+
+    async function handleRequest(url, options) {
+        const resultBox = document.getElementById('result-box');
+        resultBox.style.display = 'block';
+        resultBox.className = '';
+        
+        // Injecting the premium loading spinner
+        resultBox.innerHTML = `
+            <div class="spinner-container">
+                <div class="spinner"></div>
+                <div class="loading-text">Analyzing Telemetry...</div>
+            </div>
+        `;
+
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) throw new Error("Server error");
+            displayResult(await response.json());
+        } catch (error) {
+            resultBox.innerHTML = '<span style="color: #FCA5A5;">Connection severed. Ensure intelligence backend is active.</span>';
+        }
+    }
+
+    document.getElementById('manualForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const data = {
+            follower_count: parseInt(document.getElementById('follower_count').value),
+            following_count: parseInt(document.getElementById('following_count').value),
+            has_profile_pic: parseInt(document.getElementById('has_profile_pic').value),
+            username_digits: parseInt(document.getElementById('username_digits').value),
+            account_age_days: parseInt(document.getElementById('account_age_days').value)
+        };
+        handleRequest('http://127.0.0.1:8000/predict_manual', {
+            method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)
+        });
+    });
+
+    document.getElementById('searchForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append('username', document.getElementById('search_username').value);
+        handleRequest('http://127.0.0.1:8000/predict_search', { method: 'POST', body: formData });
+    });
+
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append('file', document.getElementById('profile_image').files[0]);
+        handleRequest('http://127.0.0.1:8000/predict_upload', { method: 'POST', body: formData });
+    });
+</script>
+
+</body>
+</html>

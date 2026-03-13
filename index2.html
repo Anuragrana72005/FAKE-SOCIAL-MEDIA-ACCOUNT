@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusX Nexus - OSINT Terminal</title>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --neon-green: #00ff66;
+            --neon-purple: #b026ff;
+            --neon-red: #ff3333;
+            --panel-bg: rgba(20, 25, 40, 0.8);
+        }
+        body {
+            background-color: var(--bg-color);
+            color: #fff;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0; padding: 20px;
+            background-image: radial-gradient(circle at 50% 50%, #1a233a 0%, #0b0f19 100%);
+            min-height: 100vh;
+        }
+        header {
+            text-align: center; border-bottom: 2px solid var(--neon-purple);
+            padding-bottom: 20px; margin-bottom: 30px;
+            text-shadow: 0 0 10px var(--neon-purple);
+        }
+        .container { max-width: 900px; margin: auto; }
+        
+        .upload-zone {
+            border: 2px dashed var(--neon-green);
+            background: var(--panel-bg);
+            padding: 40px; text-align: center;
+            border-radius: 10px; cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative; overflow: hidden;
+        }
+        .upload-zone:hover { box-shadow: 0 0 20px var(--neon-green); background: rgba(0, 255, 102, 0.1); }
+        .upload-zone input { display: none; }
+        
+        .scanning-laser {
+            position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+            background: var(--neon-green); box-shadow: 0 0 15px var(--neon-green);
+            animation: scan 2s infinite alternate; display: none;
+        }
+        @keyframes scan { from { top: 0; } to { top: 100%; } }
+
+        .dashboard { display: none; margin-top: 30px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .card {
+            background: var(--panel-bg); border: 1px solid #333;
+            padding: 20px; border-radius: 8px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+        .verdict { font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 15px;}
+        .safe { color: var(--neon-green); text-shadow: 0 0 10px var(--neon-green); }
+        .danger { color: var(--neon-red); text-shadow: 0 0 10px var(--neon-red); }
+        
+        .meter { width: 100%; height: 20px; background: #222; border-radius: 10px; overflow: hidden; margin-top: 10px;}
+        .meter-fill { height: 100%; width: 0%; background: var(--neon-purple); transition: width 1.5s ease; }
+
+        .terminal {
+            background: #000; border-left: 4px solid var(--neon-green);
+            padding: 15px; font-size: 14px; color: var(--neon-green);
+            height: 150px; overflow-y: auto; margin-top: 20px;
+        }
+        .btn {
+            display: inline-block; width: 100%; text-align: center;
+            background: var(--neon-purple); color: white; border: none;
+            padding: 15px; margin-top: 20px; font-size: 16px; cursor: pointer;
+            font-family: inherit; font-weight: bold; text-decoration: none; border-radius: 5px;
+        }
+        .btn:hover { box-shadow: 0 0 15px var(--neon-purple); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>[ CAMPUSX NEXUS ]</h1>
+        <p>OSINT Synthetic Identity & Deepfake Scanner V2.0</p>
+    </header>
+
+    <label class="upload-zone" id="drop-zone">
+        <div class="scanning-laser" id="laser"></div>
+        <h2 id="upload-text">DRAG & DROP PROFILE SCREENSHOT HERE</h2>
+        <p>or click to browse systems</p>
+        <input type="file" id="file-input" accept="image/*">
+    </label>
+
+    <div class="dashboard" id="dashboard">
+        <div class="verdict" id="verdict-box">PROCESSING...</div>
+        
+        <div class="grid">
+            <div class="card">
+                <h3>Telemetry Data</h3>
+                <p id="face-status">Face Mapping: Waiting...</p>
+                <p id="ocr-preview">Extracted Data: Waiting...</p>
+            </div>
+            <div class="card">
+                <h3>Synthetic Probability</h3>
+                <div class="meter"><div class="meter-fill" id="risk-meter"></div></div>
+                <p style="text-align: right; margin-top: 5px;" id="risk-text">0%</p>
+            </div>
+        </div>
+
+        <div class="terminal" id="gemini-terminal">Initiating Gemini Cyber-Analysis...<br></div>
+
+        <a href="#" class="btn" id="download-btn" target="_blank" style="display:none;">DOWNLOAD CERTIFIED PDF INTELLIGENCE REPORT</a>
+    </div>
+</div>
+
+<script>
+    const fileInput = document.getElementById('file-input');
+    const uploadZone = document.getElementById('drop-zone');
+    const laser = document.getElementById('laser');
+    const dashboard = document.getElementById('dashboard');
+    const terminal = document.getElementById('gemini-terminal');
+
+    fileInput.addEventListener('change', async (e) => {
+        if(!e.target.files[0]) return;
+        const file = e.target.files[0];
+        
+        // UI Updates for Scanning
+        document.getElementById('upload-text').innerText = `SCANNING: ${file.name}...`;
+        laser.style.display = 'block';
+        dashboard.style.display = 'block';
+        uploadZone.style.borderColor = 'var(--neon-purple)';
+        terminal.innerHTML = "> Uplink established. Bypassing mainframe...<br>> Extracting EXIF and OCR packets...<br>";
+
+        // Send to FastAPI
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const response = await fetch("http://127.0.0.1:8000/analyze_upload", {
+                method: "POST",
+                body: formData
+            });
+            const data = await response.json();
+
+            // Stop Laser
+            laser.style.display = 'none';
+            document.getElementById('upload-text').innerText = "UPLOAD ANOTHER TARGET";
+
+            // Update UI based on API response
+            const vBox = document.getElementById('verdict-box');
+            vBox.innerText = data.verdict;
+            if(data.verdict.includes("AUTHENTIC")) {
+                vBox.className = "verdict safe";
+            } else {
+                vBox.className = "verdict danger";
+            }
+
+            document.getElementById('face-status').innerText = `Face Mapping: ${data.face_scan_status}`;
+            document.getElementById('ocr-preview').innerText = `Extracted: ${data.extracted_text || 'No text found'}`;
+
+            // Animate Risk Meter
+            const riskPercentage = Math.round(data.synthetic_score * 100);
+            document.getElementById('risk-meter').style.width = `${riskPercentage}%`;
+            document.getElementById('risk-meter').style.backgroundColor = riskPercentage > 50 ? 'var(--neon-red)' : 'var(--neon-green)';
+            document.getElementById('risk-text').innerText = `${riskPercentage}% AI Probability`;
+
+            // Typewriter effect for Gemini AI
+            terminal.innerHTML += "<br>> <strong>GEMINI INTELLIGENCE DIRECTIVE:</strong><br>";
+            typeWriter(data.ai_narrative, terminal);
+
+            // Show PDF Button
+            const dlBtn = document.getElementById('download-btn');
+            dlBtn.href = data.pdf_url;
+            dlBtn.style.display = 'block';
+
+        } catch (error) {
+            terminal.innerHTML += `<br><span style="color:red">> ERROR: Connection to Nexus Core Failed. Is your Python server running?</span>`;
+            laser.style.display = 'none';
+        }
+    });
+
+    function typeWriter(text, element, i = 0) {
+        if (i < text.length) {
+            element.innerHTML += text.charAt(i);
+            element.scrollTop = element.scrollHeight;
+            setTimeout(() => typeWriter(text, element, i + 1), 10); // typing speed
+        }
+    }
+</script>
+
+</body>
+</html>

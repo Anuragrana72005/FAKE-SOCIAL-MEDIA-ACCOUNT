@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeriTrace AI | Forging Trust in a Digital World</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            /* Royal & Cinematic Color Palette */
+            --primary: #d4af37; /* Metallic Gold */
+            --primary-light: #f9f1cc;
+            --primary-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            --secondary: #0b0f19; /* Deep Royal Midnight */
+            --accent: #161d2d; /* Lighter Midnight */
+            --text-main: #ffffff;
+            --text-muted: #aab2c0;
+            --background: #030508; /* Void Black */
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Montserrat', sans-serif;
+            --transition-smooth: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --glow: 0 0 25px rgba(212, 175, 55, 0.3);
+        }
+
+        /* --- Reset & Base Styles --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: var(--font-sans); 
+            background-color: var(--background); 
+            background-image: radial-gradient(circle at 50% 0%, #111a2e 0%, var(--background) 70%);
+            color: var(--text-main); 
+            line-height: 1.6; 
+            overflow-x: hidden; 
+            scroll-behavior: smooth; 
+        }
+        h1, h2, h3, h4 { 
+            font-family: var(--font-serif); 
+            font-weight: 700; 
+            letter-spacing: 1.5px; 
+        }
+        a { text-decoration: none; color: inherit; transition: var(--transition-smooth); }
+        ul { list-style: none; }
+        button { cursor: pointer; border: none; outline: none; background: none; font-family: inherit; transition: var(--transition-smooth); }
+
+        /* --- Typography (Google Fonts) --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&display=swap');
+
+        /* --- Scrollbar --- */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--background); }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
+
+        /* --- Utilities --- */
+        .gold-text {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(212, 175, 55, 0.2);
+        }
+
+        /* --- Animations --- */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes float { 0% { transform: translateY(0px); filter: drop-shadow(0 5px 15px rgba(212,175,55,0.4)); } 50% { transform: translateY(-15px); filter: drop-shadow(0 15px 25px rgba(212,175,55,0.6)); } 100% { transform: translateY(0px); filter: drop-shadow(0 5px 15px rgba(212,175,55,0.4)); } }
+        .fade-in { animation: fadeIn 1.2s ease-out forwards; }
+        .staggered-item { opacity: 0; animation: fadeIn 1s ease-out forwards; }
+        .staggered-item:nth-child(2) { animation-delay: 0.2s; }
+        .staggered-item:nth-child(3) { animation-delay: 0.4s; }
+        .staggered-item:nth-child(4) { animation-delay: 0.6s; }
+        .float { animation: float 4s ease-in-out infinite; }
+
+        /* --- Layout & Structure --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        section { padding: 120px 0; border-bottom: 1px solid rgba(212, 175, 55, 0.1); position: relative; }
+        .section-title { text-align: center; font-size: 3rem; margin-bottom: 1rem; text-transform: uppercase; }
+        .section-subtitle { text-align: center; color: var(--text-muted); font-size: 1.1rem; max-width: 650px; margin: 0 auto 60px; font-weight: 300; }
+
+        /* =========================================
+           --- NEW GLASSMORPHISM & ANIMATED NAVBAR ---
+           ========================================= */
+        header { 
+            background: linear-gradient(135deg, rgba(11, 15, 25, 0.3), rgba(3, 5, 8, 0.5)); 
+            backdrop-filter: blur(20px) saturate(150%);
+            -webkit-backdrop-filter: blur(20px) saturate(150%); /* Safari Support */
+            padding: 25px 0; 
+            position: fixed; 
+            top: 0; 
+            width: 100%; 
+            z-index: 1000; 
+            transition: padding 0.5s ease, background 0.5s ease, box-shadow 0.5s ease, border-color 0.5s ease; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Frosty glass edge */
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Navbar Scrolled State */
+        header.scrolled { 
+            padding: 12px 0; 
+            background: linear-gradient(135deg, rgba(11, 15, 25, 0.85), rgba(3, 5, 8, 0.95));
+            box-shadow: 0 10px 40px rgba(0,0,0,0.9), 0 0 20px rgba(212, 175, 55, 0.15); 
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3); /* Gold glowing edge on scroll */
+        }
+        
+        .header-content { display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Animated Logo */
+        .logo { font-size: 2.2rem; font-family: var(--font-serif); font-weight: 900; letter-spacing: 2px; transition: transform 0.4s ease, text-shadow 0.4s ease; display: inline-block; }
+        .logo:hover { transform: scale(1.05); text-shadow: 0 0 20px rgba(212, 175, 55, 0.6); }
+        .logo .part2 { color: var(--primary); font-family: var(--font-sans); font-size: 1.2rem; font-weight: 300; letter-spacing: 4px; text-transform: uppercase; }
+        
+        /* Animated Nav Links */
+        nav ul { display: flex; gap: 40px; font-weight: 500; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; }
+        nav a { color: var(--text-main); position: relative; padding-bottom: 5px; transition: color 0.3s ease; }
+        
+        /* The sliding gold underline effect */
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background: var(--primary-gradient);
+            transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.8);
+            border-radius: 2px;
+        }
+        nav a:hover { color: var(--primary); text-shadow: 0 0 15px rgba(212, 175, 55, 0.4); }
+        nav a:hover::after { width: 100%; }
+        
+        .nav-right { display: flex; align-items: center; gap: 20px; }
+        
+        /* Royal Button */
+        .btn-royal { 
+            background: var(--primary-gradient); 
+            color: #000; 
+            padding: 12px 28px; 
+            border-radius: 2px; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            font-size: 0.8rem; 
+            letter-spacing: 1.5px;
+            box-shadow: var(--glow);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .btn-royal::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #fbf5b7, #b38728); z-index: -1; transition: opacity 0.5s ease; opacity: 0;
+        }
+        .btn-royal:hover::before { opacity: 1; }
+        .btn-royal:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(212, 175, 55, 0.5); }
+
+        /* --- Hero Section --- */
+        .hero { height: 100vh; display: flex; align-items: center; text-align: center; padding-top: 100px; position: relative; }
+        .hero::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 150px; background: linear-gradient(to top, var(--background), transparent); }
+        .hero-title { font-size: 4.5rem; line-height: 1.1; margin-bottom: 25px; text-transform: uppercase; text-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        .hero-title .accent-text { display: block; font-size: 2.8rem; font-family: var(--font-sans); font-weight: 300; letter-spacing: 8px; margin-bottom: 10px; color: var(--text-muted); }
+        .hero-subtitle { color: var(--text-muted); font-size: 1.25rem; max-width: 750px; margin: 0 auto 45px; font-weight: 300; line-height: 1.8; }
+        .hero-graphic { margin-top: 70px; font-size: 4.5rem; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* --- Story / Mission --- */
+        .story-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 70px; align-items: center; }
+        .story-content p { margin-bottom: 25px; font-size: 1.1rem; line-height: 1.9; color: var(--text-muted); font-weight: 300; }
+        .story-graphic-container { 
+            background: rgba(11, 15, 25, 0.6); 
+            backdrop-filter: blur(10px);
+            padding: 50px; 
+            border-radius: 4px; 
+            border: 1px solid rgba(212, 175, 55, 0.3); 
+            position: relative; 
+            overflow: hidden; 
+            height: 400px; 
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.5), 0 20px 40px rgba(0,0,0,0.4);
+        }
+        .story-graphic-container::before { 
+            content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; 
+            background: radial-gradient(circle, rgba(212,175,55,0.08) 0%, rgba(3,5,8,0) 70%); 
+            transition: var(--transition-smooth); 
+        }
+        .story-graphic-container:hover::before { transform: translate(50%, 50%); }
+        .story-graphic-container i { font-size: 8rem; color: var(--primary); opacity: 0.15; position: absolute; bottom: -10px; right: -10px; }
+        .story-title-main { font-family: var(--font-serif); font-size: 2.2rem; margin-bottom: 15px; }
+        .story-title-sub { font-size: 1.2rem; color: var(--text-main); margin-bottom: 30px; font-weight: 300; letter-spacing: 1px; }
+
+        /* --- Technology --- */
+        .tech { background-image: radial-gradient(circle at 100% 100%, #0b0f19 0%, var(--background) 100%); }
+        .tech-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+        .tech-card { 
+            background: rgba(22, 29, 45, 0.4); 
+            backdrop-filter: blur(5px);
+            padding: 50px 35px; 
+            border-radius: 4px; 
+            border: 1px solid rgba(212, 175, 55, 0.1); 
+            transition: var(--transition-smooth); 
+            text-align: center; 
+            position: relative; 
+            overflow: hidden; 
+        }
+        .tech-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: var(--primary-gradient); transform: scaleX(0); transition: transform 0.5s ease; transform-origin: left;
+        }
+        .tech-card:hover::before { transform: scaleX(1); }
+        .tech-card:hover { transform: translateY(-15px); box-shadow: 0 20px 40px rgba(0,0,0,0.6), var(--glow); border-color: rgba(212, 175, 55, 0.4); background: rgba(22, 29, 45, 0.8); }
+        .tech-card i { font-size: 3rem; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 30px; display: inline-block; }
+        .tech-card h3 { font-size: 1.4rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; font-family: var(--font-sans); }
+        .tech-card p { color: var(--text-muted); font-size: 1rem; line-height: 1.7; font-weight: 300; }
+
+        /* --- Stats / Impact --- */
+        .stats { background: linear-gradient(rgba(3,5,8,0.9), rgba(3,5,8,0.9)), url('https://www.transparenttextures.com/patterns/stardust.png'); position: relative; border-top: 1px solid rgba(212,175,55,0.2); border-bottom: 1px solid rgba(212,175,55,0.2); }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; text-align: center; }
+        .stats-item { background: rgba(11, 15, 25, 0.7); padding: 50px 25px; border-radius: 4px; border: 1px solid rgba(212, 175, 55, 0.1); backdrop-filter: blur(8px); box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
+        .stats-num { font-family: var(--font-serif); font-size: 3.8rem; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900; margin-bottom: 15px; filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.3)); }
+        .stats-num::after { content: ""; display: block; width: 60px; height: 2px; background: var(--primary-gradient); margin: 15px auto; opacity: 0.7; }
+        .stats-title { font-size: 1.15rem; color: var(--text-main); text-transform: uppercase; letter-spacing: 2px; font-weight: 600; }
+        .stats-desc { color: var(--text-muted); font-size: 0.95rem; margin-top: 8px; font-weight: 300; }
+
+        /* --- Graphs Section --- */
+        .graphs .graphs-content { display: grid; grid-template-columns: 2fr 1.5fr; gap: 60px; align-items: center; }
+        .chart-container { background: rgba(11, 15, 25, 0.6); padding: 40px; border-radius: 4px; border: 1px solid rgba(212, 175, 55, 0.2); height: 450px; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
+        .chart-desc-title { font-size: 1.8rem; text-transform: uppercase; margin-bottom: 25px; font-family: var(--font-serif); }
+        .chart-desc-text { color: var(--text-muted); line-height: 1.9; font-size: 1.1rem; font-weight: 300; }
+
+        /* --- Footer --- */
+        footer { background-color: #010203; padding: 80px 0; border-top: 1px solid rgba(212, 175, 55, 0.2); color: var(--text-muted); font-size: 0.95rem; }
+        .footer-content { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 50px; margin-bottom: 60px; }
+        .footer-logo { font-size: 2rem; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: var(--font-serif); margin-bottom: 20px; display: inline-block; font-weight: 900; }
+        .footer-logo span { color: var(--text-main); font-family: var(--font-sans); font-size: 1rem; font-weight: 300; letter-spacing: 2px; }
+        .footer-links h4 { color: var(--primary-light); margin-bottom: 25px; text-transform: uppercase; font-size: 1.05rem; letter-spacing: 2px; font-family: var(--font-sans); }
+        .footer-links ul { display: flex; flex-direction: column; gap: 15px; font-weight: 300; }
+        .footer-links a:hover { color: var(--primary); padding-left: 8px; text-shadow: 0 0 10px rgba(212,175,55,0.4); }
+        .copyright { text-align: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 40px; font-weight: 300; letter-spacing: 1px; }
+
+        /* --- Login Modal --- */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 2000; opacity: 0; visibility: hidden; transition: var(--transition-smooth); backdrop-filter: blur(15px); }
+        .modal.open { opacity: 1; visibility: visible; }
+        .modal-content { background: rgba(11, 15, 25, 0.9); padding: 60px; border-radius: 4px; border: 1px solid var(--primary); width: 100%; max-width: 550px; position: relative; animation: fadeIn 0.6s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: var(--glow), 0 20px 60px rgba(0,0,0,0.8); }
+        .modal-content::before { content: ""; position: absolute; top: -1px; left: -1px; right: -1px; bottom: -1px; background: var(--primary-gradient); z-index: -1; border-radius: 4px; opacity: 0.5; }
+        .close-modal { position: absolute; top: 25px; right: 25px; font-size: 1.8rem; color: var(--text-muted); background: none; border: none; cursor: pointer; transition: var(--transition-smooth); }
+        .close-modal:hover { color: var(--primary); filter: drop-shadow(0 0 8px var(--primary)); }
+        .modal-title { font-size: 2.5rem; text-align: center; margin-bottom: 15px; }
+        .modal-subtitle { text-align: center; color: var(--text-muted); margin-bottom: 40px; font-size: 1.1rem; font-weight: 300; letter-spacing: 1px; }
+        .form-group { margin-bottom: 25px; position: relative; }
+        .form-group i { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--text-muted); transition: var(--transition-smooth); font-size: 1.1rem; }
+        .form-input { width: 100%; padding: 18px 20px 18px 55px; background-color: rgba(3, 5, 8, 0.6); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 2px; color: var(--text-main); font-family: inherit; font-size: 1rem; transition: var(--transition-smooth); font-weight: 300; }
+        .form-input:focus { border-color: var(--primary); background-color: rgba(3, 5, 8, 0.9); box-shadow: inset 0 0 10px rgba(212, 175, 55, 0.1), 0 0 15px rgba(212, 175, 55, 0.2); }
+        .form-input:focus + i { color: var(--primary); text-shadow: 0 0 8px rgba(212, 175, 55, 0.5); }
+        .form-submit-btn { width: 100%; background: var(--primary-gradient); color: #000; padding: 18px; border-radius: 2px; font-weight: 700; text-transform: uppercase; font-size: 1.1rem; letter-spacing: 2px; border: none; transition: var(--transition-smooth); cursor: pointer; box-shadow: var(--glow); margin-top: 10px; }
+        .form-submit-btn:hover { box-shadow: 0 10px 30px rgba(212, 175, 55, 0.6); transform: translateY(-2px); }
+        .modal-footer-links { text-align: center; margin-top: 35px; color: var(--text-muted); font-size: 0.95rem; font-weight: 300; }
+        .modal-footer-links a { color: var(--primary-light); }
+        .modal-footer-links a:hover { color: var(--primary); text-shadow: 0 0 8px rgba(212, 175, 55, 0.4); }
+
+        /* --- Scroll Trigger Effects --- */
+        [data-scroll] { opacity: 0; transition: transform 1s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 1s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        [data-scroll="in"] { opacity: 1; transform: translateY(0); }
+        [data-scroll="out"] { opacity: 0; transform: translateY(40px); }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container header-content">
+            <a href="#" class="logo">VeriTrace <span class="part2">AI</span></a>
+            <nav>
+                <ul>
+                    <li><a href="#hero">Genesis</a></li>
+                    <li><a href="#story">The Mission</a></li>
+                    <li><a href="#tech">Forged in AI</a></li>
+                    <li><a href="#graphs">Insights</a></li>
+                </ul>
+            </nav>
+            <div class="nav-right">
+                <button class="btn-royal" id="openModalBtn">Command Hub</button>
+            </div>
+        </div>
+    </header>
+
+    <section id="hero" class="hero">
+        <div class="container fade-in">
+            <h1 class="hero-title">
+                <span class="accent-text">Forging Trust</span>
+                <span class="gold-text">In an Era of Digital Deception</span>
+            </h1>
+            <p class="hero-subtitle">
+                VeriTrace AI utilizes next-generation Machine Learning and Computer Vision to pierce the veil of synthetic accounts, protect identities, and secure platforms with unparalleled precision.
+            </p>
+            <a href="#story" class="btn-royal">Discover Our Genesis</a>
+            <div class="hero-graphic float"><i class="fas fa-microchip"></i></div>
+        </div>
+    </section>
+
+    <section id="story" class="story">
+        <div class="container story-grid" data-scroll>
+            <div class="story-content">
+                <h2 class="section-title gold-text">The Genesis</h2>
+                <h3 class="story-title-sub">Our Creed: Authenticity Must Be Defended.</h3>
+                <p>VeriTrace AI was born from the growing shadow of misinformation, financial fraud, and identity theft. In a world where an account can be synthetically created in seconds, we set out to build the ultimate vanguard for authenticity.</p>
+                <p>Our goal is simple yet complex: to create the most comprehensive, intelligent system for detecting fraudulent accounts across social networks and professional platforms, empowering users and businesses to interact with absolute confidence.</p>
+                <p>We believe the future of the digital realm depends entirely on trust. VeriTrace AI is the fortress that secures that future.</p>
+            </div>
+            <div class="story-graphic-container">
+                <h4 class="story-title-main gold-text">Vanguard of Authenticity</h4>
+                <p class="story-title-sub">Defending enterprise networks from synthetic threats.</p>
+                <i class="fas fa-shield-alt float"></i>
+            </div>
+        </div>
+    </section>
+
+    <section id="tech" class="tech">
+        <div class="container">
+            <h2 class="section-title gold-text">Forged in AI</h2>
+            <p class="section-subtitle">Our arsenal is a symphony of multi-layered intelligence, architected for absolute detection capability.</p>
+            <div class="tech-grid">
+                <div class="tech-card staggered-item" data-scroll>
+                    <i class="fas fa-network-wired"></i>
+                    <h3 class="gold-text">Neural Behavioral Analysis</h3>
+                    <p>We analyze subtle micro-behaviors that bots cannot simulate—from complex ratio analysis across platforms like LinkedIn and Instagram to advanced NLP text scanning in profile biographies.</p>
+                </div>
+                <div class="tech-card staggered-item" data-scroll>
+                    <i class="fas fa-eye"></i>
+                    <h3 class="gold-text">Advanced Vision Engine</h3>
+                    <p>Our AI visually parses screenshots, bypassing standard API limits. It extracts critical data via OCR and detects high-value security markers like verification badges using HSV color masking.</p>
+                </div>
+                <div class="tech-card staggered-item" data-scroll>
+                    <i class="fas fa-chart-line"></i>
+                    <h3 class="gold-text">Weighted Fusion Matrix</h3>
+                    <p>Decisions are never made on a single data point. Our system aggregates multiple AI models into a weighted algorithmic fusion matrix, delivering a verified, near-perfect accuracy rate.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="stats" class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stats-item" data-scroll>
+                    <div class="stats-num" data-target="15000000">0</div>
+                    <div class="stats-title gold-text">Accounts Analyzed</div>
+                    <div class="stats-desc">Across all global networks.</div>
+                </div>
+                <div class="stats-item" data-scroll>
+                    <div class="stats-num" data-target="98.7">0</div>
+                    <div class="stats-title gold-text">Detection Accuracy</div>
+                    <div class="stats-desc">Verified algorithmic benchmark.</div>
+                </div>
+                <div class="stats-item" data-scroll>
+                    <div class="stats-num" data-target="100">0</div>
+                    <div class="stats-title gold-text">Billion Threats</div>
+                    <div class="stats-desc">Identified and neutralized.</div>
+                </div>
+                <div class="stats-item" data-scroll>
+                    <div class="stats-num" data-target="500">0</div>
+                    <div class="stats-title gold-text">Platforms Supported</div>
+                    <div class="stats-desc">Seamless enterprise integrations.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="graphs" class="graphs">
+        <div class="container">
+            <h2 class="section-title gold-text">Detection Insights</h2>
+            <p class="section-subtitle">Real-time breakdown of detected fraudulent activities neutralized across our global network.</p>
+            <div class="graphs-content" data-scroll>
+                <div class="chart-container">
+                    <canvas id="threatChart"></canvas>
+                </div>
+                <div class="chart-desc">
+                    <h3 class="chart-desc-title gold-text">Fraud Vector Analysis</h3>
+                    <p class="chart-desc-text">Our intelligence network continuously adapts to hundreds of evolving threat vectors. This chart details the most common fraudulent methods intercepted by VeriTrace AI, highlighting our dominance over automated bots, scam syndicates, and coordinated misinformation campaigns. The "Advanced Deception" vector isolates sophisticated threats that bypass standard security layers but inevitably fail against our system.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <a href="#" class="footer-logo">VeriTrace <span>AI</span></a>
+                    <p style="font-weight: 300; line-height: 1.8;">The premium vanguard for digital trust and authenticity. Secure your enterprise from synthetic deception.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Core Creed</h4>
+                    <ul>
+                        <li><a href="#hero">Genesis</a></li>
+                        <li><a href="#story">The Mission</a></li>
+                        <li><a href="#tech">Our Arsenal</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>The Fortress</h4>
+                    <ul>
+                        <li><a href="#">Security Hub</a></li>
+                        <li><a href="#">Contact Integrity</a></li>
+                        <li><a href="#">Legal Statutes</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2024 VeriTrace AI. All Rights Reserved. A component of the Digital Trust Initiative.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeModalBtn">&times;</button>
+            <h2 class="modal-title gold-text">Ascend to Access</h2>
+            <p class="modal-subtitle">Authenticate to enter the VeriTrace AI command hub.</p>
+            <form id="loginForm">
+                <div class="form-group">
+                    <input type="email" class="form-input" placeholder="Credential Email" required>
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-input" placeholder="Access Cipher" required>
+                    <i class="fas fa-lock"></i>
+                </div>
+                <button type="submit" class="form-submit-btn">Ascend</button>
+            </form>
+            <div class="modal-footer-links">
+                <a href="#">Forgotten Cipher?</a> &nbsp;|&nbsp; <a href="#">Establish New Legacy</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Header Scroll Effect ---
+        const header = document.querySelector('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) { header.classList.add('scrolled'); }
+            else { header.classList.remove('scrolled'); }
+        });
+
+        // --- Stats Counter ---
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const easeOutQuad = progress * (2 - progress); 
+                let currentVal = start + (end - start) * easeOutQuad;
+                
+                if (end % 1 !== 0) {
+                    obj.innerHTML = currentVal.toFixed(1);
+                } else {
+                    obj.innerHTML = Math.floor(currentVal);
+                }
+                
+                if (progress < 1) { 
+                    window.requestAnimationFrame(step); 
+                } else { 
+                    obj.innerHTML = end % 1 !== 0 ? end.toFixed(1) : end; 
+                    if (end === 15000000) obj.innerHTML = "15M+"; 
+                    if (end === 100) obj.innerHTML += "+";
+                } 
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        const statsNums = document.querySelectorAll('.stats-num');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const target = parseFloat(entry.target.getAttribute('data-target'));
+                    animateValue(entry.target, 0, target, 2500);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+        statsNums.forEach(num => observer.observe(num));
+
+        // --- Chart.js Integration ---
+        const ctx = document.getElementById('threatChart').getContext('2d');
+        const threatChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Mass-Following Bots', 'Scam Coordinates', 'Identity Deception', 'Coordinated Misinformation', 'Advanced Deception'],
+                datasets: [{
+                    label: 'Threat Distribution (%)',
+                    data: [30, 25, 20, 15, 10],
+                    backgroundColor: ['#d4af37', '#b38728', '#1f2a40', '#161d2d', '#030508'],
+                    borderColor: '#111a2e',
+                    borderWidth: 2,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%',
+                plugins: {
+                    legend: { position: 'right', labels: { color: '#aab2c0', font: { family: 'Montserrat', size: 12, weight: '300' }, padding: 20 } },
+                    title: { display: false }
+                }
+            }
+        });
+
+        // --- Modal Logic ---
+        const openModalBtn = document.getElementById('openModalBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const modal = document.getElementById('loginModal');
+        const loginForm = document.getElementById('loginForm');
+
+        openModalBtn.addEventListener('click', (e) => { e.preventDefault(); modal.classList.add('open'); });
+        closeModalBtn.addEventListener('click', () => modal.classList.remove('open'));
+        window.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            modal.classList.remove('open');
+        });
+
+        // --- Scroll Reveal Effect ---
+        const scrollReveal = document.querySelectorAll('[data-scroll]');
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) { entry.target.setAttribute('data-scroll', 'in'); }
+            });
+        }, { threshold: 0.15 });
+        scrollReveal.forEach(el => revealObserver.observe(el));
+
+    </script>
+</body>
+</html>

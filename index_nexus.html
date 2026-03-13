@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusX Nexus - OSINT Terminal</title>
+    <style>
+        :root {
+            --bg-color: #0b0f19; --neon-green: #00ff66; --neon-purple: #b026ff;
+            --neon-red: #ff3333; --neon-blue: #00eeff; --neon-orange: #ff9900;
+            --panel-bg: rgba(20, 25, 40, 0.8);
+        }
+        body {
+            background-color: var(--bg-color); color: #fff; font-family: 'Courier New', Courier, monospace;
+            margin: 0; padding: 20px; background-image: radial-gradient(circle at 50% 50%, #1a233a 0%, #0b0f19 100%); min-height: 100vh;
+        }
+        header { text-align: center; border-bottom: 2px solid var(--neon-purple); padding-bottom: 20px; margin-bottom: 30px; text-shadow: 0 0 10px var(--neon-purple); }
+        .container { max-width: 1000px; margin: auto; }
+        
+        .upload-zone {
+            border: 2px dashed var(--neon-blue); background: var(--panel-bg); padding: 40px; text-align: center; border-radius: 10px; cursor: pointer; position: relative; overflow: hidden;
+        }
+        .upload-zone:hover { box-shadow: 0 0 20px var(--neon-blue); background: rgba(0, 238, 255, 0.1); }
+        .upload-zone input { display: none; }
+        
+        .scanning-laser { position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); animation: scan 1.5s infinite alternate; display: none; }
+        @keyframes scan { from { top: 0; } to { top: 100%; } }
+
+        .dashboard { display: none; margin-top: 30px; }
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .card { background: var(--panel-bg); border: 1px solid #333; padding: 15px; border-radius: 8px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); font-size: 13px;}
+        .card h3 { margin-top: 0; font-size: 15px; color: var(--neon-blue); border-bottom: 1px solid #333; padding-bottom: 5px; }
+        
+        .verdict-banner { font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 20px; padding: 15px; border-radius: 5px; background: #111; }
+        .safe { color: var(--neon-green); border: 1px solid var(--neon-green); text-shadow: 0 0 10px var(--neon-green); }
+        .danger { color: var(--neon-red); border: 1px solid var(--neon-red); text-shadow: 0 0 10px var(--neon-red); }
+        
+        .meter { width: 100%; height: 12px; background: #222; border-radius: 5px; overflow: hidden; margin-top: 5px;}
+        .meter-fill { height: 100%; width: 0%; background: var(--neon-purple); transition: width 1.5s ease; }
+
+        .radar-box { position: relative; width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--neon-green); margin: 10px auto; overflow: hidden; background: rgba(0, 255, 102, 0.05); }
+        .radar-box::after { content: ''; position: absolute; top: 50%; left: 50%; width: 50%; height: 50%; background: conic-gradient(from 0deg, transparent 70%, rgba(0, 255, 102, 0.8) 100%); transform-origin: 0% 0%; animation: spin 2s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .grid-lines { position: absolute; top: 50%; left: 0; width: 100%; height: 1px; background: rgba(0,255,102,0.3); }
+        .grid-lines::after { content: ''; position: absolute; top: -40px; left: 40px; width: 1px; height: 80px; background: rgba(0,255,102,0.3); }
+
+        .terminal { background: #000; border-left: 4px solid var(--neon-purple); padding: 15px; font-size: 14px; color: var(--neon-blue); height: 120px; overflow-y: auto; margin-top: 20px; }
+        .btn { display: inline-block; width: 100%; text-align: center; box-sizing: border-box; background: var(--neon-purple); color: white; border: none; padding: 15px; margin-top: 20px; font-size: 16px; cursor: pointer; font-family: inherit; font-weight: bold; text-decoration: none; border-radius: 5px; }
+        .btn:hover { box-shadow: 0 0 15px var(--neon-purple); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>[ CAMPUSX NEXUS CORE ]</h1>
+        <p>OSINT Master Dashboard - All Subsystems Active</p>
+    </header>
+
+    <label class="upload-zone" id="drop-zone">
+        <div class="scanning-laser" id="laser"></div>
+        <h2 id="upload-text">DRAG & DROP TARGET ASSET HERE</h2>
+        <p>Engage Vision, AI, and Network Scanners</p>
+        <input type="file" id="file-input" accept="image/*">
+    </label>
+
+    <div class="dashboard" id="dashboard">
+        <div class="verdict-banner" id="verdict-box">PROCESSING...</div>
+        
+        <div class="grid">
+            <div class="card">
+                <h3>Asset Telemetry</h3>
+                <p id="face-status">Face: Waiting...</p>
+                <p id="stego-status">LSB Stego: Waiting...</p>
+                <p id="gps-status" style="color: var(--neon-orange);">GPS: Waiting...</p>
+                <div class="meter"><div class="meter-fill" id="risk-meter"></div></div>
+                <p style="text-align: right; margin-top: 5px; font-size: 11px;" id="risk-text">0% Synthetic Prob</p>
+            </div>
+
+            <div class="card" style="text-align: center;">
+                <h3>Threat Network</h3>
+                <div class="radar-box"><div class="grid-lines"></div></div>
+                <p id="botnet-text" style="color: var(--neon-green); font-weight: bold; margin-bottom: 0;">0 Nodes</p>
+                <p id="darkweb-text" style="color: var(--neon-red); font-weight: bold; margin-top: 5px;">0% Dark Web Risk</p>
+            </div>
+
+            <div class="card">
+                <h3>OCR Intelligence</h3>
+                <p id="ocr-preview" style="color: #888; font-size: 12px; word-wrap: break-word;">Waiting for extract...</p>
+            </div>
+        </div>
+
+        <div class="terminal" id="gemini-terminal">Initializing Gemini Cyber-Analysis...<br></div>
+        <a href="#" class="btn" id="download-btn" target="_blank" style="display:none;">DOWNLOAD SECURE INTELLIGENCE DOSSIER (PDF)</a>
+    </div>
+</div>
+
+<script>
+    const fileInput = document.getElementById('file-input');
+    const uploadZone = document.getElementById('drop-zone');
+    const laser = document.getElementById('laser');
+    const dashboard = document.getElementById('dashboard');
+    const terminal = document.getElementById('gemini-terminal');
+
+    fileInput.addEventListener('change', async (e) => {
+        if(!e.target.files[0]) return;
+        const file = e.target.files[0];
+        
+        document.getElementById('upload-text').innerText = `UPLINK ACTIVE. ANALYZING: ${file.name}...`;
+        laser.style.display = 'block'; dashboard.style.display = 'block';
+        uploadZone.style.borderColor = 'var(--neon-purple)';
+        terminal.innerHTML = "> Executing deep packet sniff...<br>> Mapping botnets & Dark Web leaks...<br>";
+
+        const formData = new FormData(); formData.append("file", file);
+
+        try {
+            const response = await fetch("http://127.0.0.1:8000/analyze_upload", {
+                method: "POST", body: formData
+            });
+            const data = await response.json();
+
+            laser.style.display = 'none';
+            document.getElementById('upload-text').innerText = "UPLOAD NEXT TARGET";
+
+            const vBox = document.getElementById('verdict-box');
+            vBox.innerText = data.verdict;
+            vBox.className = data.verdict.includes("AUTHENTIC") ? "verdict-banner safe" : "verdict-banner danger";
+
+            document.getElementById('face-status').innerText = `Face: ${data.face_scan_status}`;
+            
+            const stegoNode = document.getElementById('stego-status');
+            stegoNode.innerText = `Stego: ${data.stego_status}`;
+            stegoNode.style.color = data.stego_status.includes("ANOMALY") ? "var(--neon-red)" : "#fff";
+
+            document.getElementById('gps-status').innerText = `GPS: ${data.gps_status}`;
+
+            const botnetText = document.getElementById('botnet-text');
+            botnetText.innerText = `${data.botnet_nodes} Network Nodes`;
+            botnetText.style.color = data.botnet_nodes > 10 ? "var(--neon-red)" : "var(--neon-green)";
+
+            const darkwebText = document.getElementById('darkweb-text');
+            darkwebText.innerText = `${data.dark_web_exposure}% Dark Web Exposure`;
+            darkwebText.style.color = data.dark_web_exposure > 20 ? "var(--neon-red)" : "var(--neon-green)";
+
+            document.getElementById('ocr-preview').innerText = `${data.extracted_text || 'No text detected.'}`;
+
+            const riskPercentage = Math.round(data.synthetic_score * 100);
+            document.getElementById('risk-meter').style.width = `${riskPercentage}%`;
+            document.getElementById('risk-meter').style.backgroundColor = riskPercentage > 50 ? 'var(--neon-red)' : 'var(--neon-purple)';
+            document.getElementById('risk-text').innerText = `${riskPercentage}% Synthetic Prob`;
+
+            terminal.innerHTML += "<br>> <strong>AI NARRATIVE:</strong><br>";
+            typeWriter(data.ai_narrative, terminal);
+
+            const dlBtn = document.getElementById('download-btn');
+            dlBtn.href = data.pdf_url; dlBtn.style.display = 'block';
+
+        } catch (error) {
+            terminal.innerHTML += `<br><span style="color:red">> CRITICAL ERROR: Nexus Backend Offline. Ensure you are running the Python file.</span>`;
+            laser.style.display = 'none';
+        }
+    });
+
+    function typeWriter(text, element, i = 0) {
+        if (i < text.length) {
+            element.innerHTML += text.charAt(i); element.scrollTop = element.scrollHeight;
+            setTimeout(() => typeWriter(text, element, i + 1), 15); 
+        }
+    }
+</script>
+</body>
+</html>

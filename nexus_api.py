@@ -18,7 +18,7 @@ from PIL import Image, ExifTags
 # ==========================================
 # 1. CONFIGURATION & SUBSYSTEMS
 # ==========================================
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyDrfWTvdPwL3_M4yfm-VWkKW1mZdwHp3sM")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "Paste Api")
 genai.configure(api_key=GEMINI_API_KEY) 
 gemini_model = genai.GenerativeModel("gemini-2.5-flash")
 
